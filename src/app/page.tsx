@@ -34,7 +34,7 @@ export default async function Home() {
     logsToday,
     dueQuestions,
     recentLogs,
-    allQuestionStats,
+    tagStatsRaw,
     activityCounts,
   ] = await Promise.all([
     prisma.answerLog.count(),
@@ -59,8 +59,11 @@ export default async function Home() {
         },
       },
     }),
-    prisma.question.findMany({
-      select: { tagGroup: true, lastResult: true },
+    prisma.question.groupBy({
+      by: ["tagGroup", "lastResult"],
+      _count: {
+        _all: true,
+      },
     }),
     prisma.answerLog.groupBy({
       by: ["studyDate"],
@@ -71,9 +74,16 @@ export default async function Home() {
 
   // TagGroupごとの統計
   const tagStats = TAG_GROUPS.map((tag) => {
-    const qs = allQuestionStats.filter((q) => q.tagGroup === tag);
-    const total = qs.length;
-    const correct = qs.filter((q) => q.lastResult === "Correct").length;
+    // このタググループに関連する集計データを抽出
+    const relatedStats = tagStatsRaw.filter((s) => s.tagGroup === tag);
+
+    // 合計数
+    const total = relatedStats.reduce((acc, curr) => acc + curr._count._all, 0);
+
+    // 正答数 (lastResult === "Correct" のものを集計)
+    const correctStats = relatedStats.find((s) => s.lastResult === "Correct");
+    const correct = correctStats ? correctStats._count._all : 0;
+
     const progress = total > 0 ? (correct / total) * 100 : 0;
     return { tag, total, correct, progress };
   }).filter(s => s.total > 0); // データがあるものだけ表示

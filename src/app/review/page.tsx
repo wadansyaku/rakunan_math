@@ -86,47 +86,7 @@ async function getReviewQuestions() {
     return { dueQuestions, wrongQuestions, randomQuestions };
 }
 
-function calculatePriority(q: Question): number {
-    let score = 0;
-
-    // 期限切れ日数
-    if (q.nextReviewDate) {
-        const daysOverdue = Math.max(0, diffDays(q.nextReviewDate));
-        score += Math.min(daysOverdue, 30);
-    }
-
-    // 直近Wrongに重み
-    if (q.lastResult === "Wrong") score += 20;
-    else if (q.lastResult === "Partial") score += 10;
-
-    // 難易度
-    if (q.difficulty) score += q.difficulty * 2;
-
-    // 必解
-    if (q.mustSolve) score += 15;
-
-    return score;
-}
-
-function getPriorityBreakdown(q: Question) {
-    const daysOverdue = q.nextReviewDate ? Math.max(0, diffDays(q.nextReviewDate)) : 0;
-
-    const overdueScore = Math.min(daysOverdue, 30);
-    const wrongScore = q.lastResult === "Wrong" ? 20 : q.lastResult === "Partial" ? 10 : 0;
-    const diffScore = (q.difficulty || 0) * 2;
-    const mustScore = q.mustSolve ? 15 : 0;
-
-    return {
-        total: overdueScore + wrongScore + diffScore + mustScore,
-        details: {
-            daysOverdue,
-            overdueScore,
-            wrongScore,
-            diffScore,
-            mustScore
-        }
-    };
-}
+import { calculatePriority, getPriorityBreakdown } from "@/lib/learning/priority";
 
 export default async function ReviewPage() {
     const { dueQuestions, wrongQuestions, randomQuestions } = await getReviewQuestions();
