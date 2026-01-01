@@ -120,14 +120,14 @@ export default async function Home() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-muted/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">総問題数</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">総問題数</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalQuestions}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-xl font-semibold text-muted-foreground">{totalQuestions}</div>
+            <p className="text-xs text-muted-foreground/80">
               登録済み（全259問中）
             </p>
           </CardContent>
