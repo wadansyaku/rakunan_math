@@ -303,7 +303,7 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
             </Card>
 
             <Card>
-                <CardContent className="p-0 max-h-[70vh] overflow-y-auto">
+                <CardContent className="p-0 max-h-[70vh] overflow-auto">
                     <Table>
                         <TableHeader>
                             <TableRow>
