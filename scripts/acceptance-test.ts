@@ -1,10 +1,11 @@
 
 import "dotenv/config";
 import { execSync } from "child_process";
-import { prisma } from "../src/lib/prisma";
+import { getPrismaClient } from "../src/lib/prisma";
 
 async function main() {
     console.log("🚀 Starting Acceptance Test...\n");
+    const prisma = getPrismaClient();
 
     try {
         // 1. Lint Check

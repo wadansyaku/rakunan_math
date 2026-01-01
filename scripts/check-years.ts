@@ -1,6 +1,8 @@
 
 import "dotenv/config";
-import { prisma } from "../src/lib/prisma";
+import { getPrismaClient } from "../src/lib/prisma";
+
+const prisma = getPrismaClient();
 
 async function main() {
     const questions = await prisma.question.groupBy({
