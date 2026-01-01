@@ -16,12 +16,18 @@ import { parse } from "csv-parse/sync";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const pooledUrl = process.env.POSTGRES_PRISMA_URL || process.env.DATABASE_URL;
-const directUrl = process.env.POSTGRES_URL_NON_POOLING || process.env.DIRECT_URL;
+const pooledUrl =
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.DATABASE_URL;
+const directUrl =
+    process.env.POSTGRES_URL_NON_POOLING ||
+    process.env.DATABASE_URL_UNPOOLED ||
+    process.env.DIRECT_URL;
 const connectionString = directUrl || pooledUrl;
 
 if (!connectionString || !connectionString.startsWith("postgres")) {
-    throw new Error("DATABASE_URL is missing or invalid. Set DIRECT_URL/POSTGRES_URL_NON_POOLING for import.");
+    throw new Error("DATABASE_URL is missing or invalid. Set DIRECT_URL/POSTGRES_URL_NON_POOLING/DATABASE_URL_UNPOOLED for import.");
 }
 
 const pool = new Pool({ connectionString });
