@@ -12,11 +12,16 @@ import { Pool } from "pg";
 const pooledUrl =
     process.env.POSTGRES_PRISMA_URL ||
     process.env.POSTGRES_URL ||
-    process.env.DATABASE_URL;
+    process.env.DATABASE_URL ||
+    process.env.STORAGE_POSTGRES_PRISMA_URL ||
+    process.env.STORAGE_POSTGRES_URL ||
+    process.env.STORAGE_DATABASE_URL;
 const directUrl =
     process.env.POSTGRES_URL_NON_POOLING ||
     process.env.DATABASE_URL_UNPOOLED ||
-    process.env.DIRECT_URL;
+    process.env.DIRECT_URL ||
+    process.env.STORAGE_POSTGRES_URL_NON_POOLING ||
+    process.env.STORAGE_DATABASE_URL_UNPOOLED;
 const connectionString = directUrl || pooledUrl;
 
 if (!connectionString || !connectionString.startsWith("postgres")) {
