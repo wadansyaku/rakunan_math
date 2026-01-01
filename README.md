@@ -79,9 +79,9 @@ VERTEX_CLAUDE_MODEL="claude-3-7-sonnet@20250219"
 ## Vercelデプロイ
 
 1. Vercelで新規プロジェクトを作成し、Vercel Postgresを追加  
-2. 環境変数 `DATABASE_URL` と `DIRECT_URL` をVercelが自動設定  
-   - `DATABASE_URL` は `POSTGRES_PRISMA_URL` を指定  
-   - `DIRECT_URL` は `POSTGRES_URL_NON_POOLING` を指定  
+2. Vercel Postgresの環境変数が自動で追加されていることを確認  
+   - `POSTGRES_PRISMA_URL` / `POSTGRES_URL_NON_POOLING` が存在する  
+3. 必要なら `DATABASE_URL` / `DIRECT_URL` を上記の値で上書き  
 3. ローカルで `npm run db:migrate` を実行してテーブル作成  
 4. `RESET_DB=true npm run import:excel` → `npx tsx scripts/import-answers.ts` を実行  
 

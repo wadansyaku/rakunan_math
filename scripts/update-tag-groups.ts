@@ -9,9 +9,15 @@ import { PrismaClient } from "../src/generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
-const pool = new Pool({
-    connectionString: process.env.DIRECT_URL || process.env.DATABASE_URL,
-});
+const pooledUrl = process.env.POSTGRES_PRISMA_URL || process.env.DATABASE_URL;
+const directUrl = process.env.POSTGRES_URL_NON_POOLING || process.env.DIRECT_URL;
+const connectionString = directUrl || pooledUrl;
+
+if (!connectionString || !connectionString.startsWith("postgres")) {
+    throw new Error("DATABASE_URL is missing or invalid. Set DIRECT_URL/POSTGRES_URL_NON_POOLING for update-tag-groups.");
+}
+
+const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
