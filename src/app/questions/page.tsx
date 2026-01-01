@@ -41,6 +41,7 @@ interface PageProps {
         status?: string;
         due?: string;
         sort?: string;
+        limit?: string;
     }>;
 }
 
@@ -52,6 +53,9 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
     const status = params.status || "all";
     const dueOnly = params.due === "true";
     const sort = params.sort || "year";
+    const limitOptions = [20, 50, 100, 200];
+    const parsedLimit = Number.parseInt(params.limit || "100", 10);
+    const limit = limitOptions.includes(parsedLimit) ? parsedLimit : 100;
 
     const whereCondition: Prisma.QuestionWhereInput = {
         ...(params.year && { year: parseInt(params.year) }),
@@ -77,7 +81,10 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
             wrong: "Wrong",
             skipped: "Skipped",
         };
-        whereCondition.lastResult = statusMap[status];
+        const mapped = statusMap[status];
+        if (mapped) {
+            whereCondition.lastResult = mapped;
+        }
     }
 
     if (dueOnly) {
@@ -93,16 +100,19 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                     ? [{ logs: { _count: "desc" } }, { year: "desc" }, { section: "asc" }, { sub: "asc" }]
                     : [{ year: "desc" }, { section: "asc" }, { sub: "asc" }];
 
-    const questions = await prisma.question.findMany({
-        take: 100,
-        orderBy,
-        where: whereCondition,
-        include: {
-            _count: {
-                select: { logs: true },
+    const [questions, totalCount] = await Promise.all([
+        prisma.question.findMany({
+            take: limit,
+            orderBy,
+            where: whereCondition,
+            include: {
+                _count: {
+                    select: { logs: true },
+                },
             },
-        },
-    });
+        }),
+        prisma.question.count({ where: whereCondition }),
+    ]);
 
     return (
         <div className="space-y-6">
@@ -111,7 +121,7 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                 <div>
                     <h1 className="text-3xl font-bold">問題バンク</h1>
                     <p className="text-muted-foreground">
-                        {questions.length}件の問題を表示中（最大100件）
+                        {totalCount}件中 {questions.length}件を表示
                     </p>
                 </div>
             </div>
@@ -125,7 +135,7 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                 </CardHeader>
                 <CardContent>
                     <form className="space-y-4">
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7 items-end">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-8 items-end">
                             <div className="space-y-2 lg:col-span-2">
                                 <Label htmlFor="q">キーワード</Label>
                                 <Input
@@ -170,10 +180,10 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                                     <SelectContent>
                                         <SelectItem value="all">全て</SelectItem>
                                         <SelectItem value="none">未実施</SelectItem>
-                                        <SelectItem value="correct">Correct</SelectItem>
-                                        <SelectItem value="partial">Partial</SelectItem>
-                                        <SelectItem value="wrong">Wrong</SelectItem>
-                                        <SelectItem value="skipped">Skipped</SelectItem>
+                                        <SelectItem value="correct">正解 (Correct)</SelectItem>
+                                        <SelectItem value="partial">部分正解 (Partial)</SelectItem>
+                                        <SelectItem value="wrong">不正解 (Wrong)</SelectItem>
+                                        <SelectItem value="skipped">スキップ (Skipped)</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -215,6 +225,21 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                                     </SelectContent>
                                 </Select>
                             </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="limit">表示件数</Label>
+                                <Select name="limit" defaultValue={String(limit)}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="100件" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {limitOptions.map((value) => (
+                                            <SelectItem key={value} value={String(value)}>
+                                                {value}件
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                             <div className="md:col-span-2 lg:col-span-1">
                                 <div className="flex gap-2">
                                     <Button type="submit" className="w-full">
@@ -228,6 +253,9 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                             </div>
                         </div>
                     </form>
+                    <p className="text-xs text-muted-foreground">
+                        ヒント: 「期限切れのみ」や「最近学習した順」を使うと、次に取り組む問題が見つけやすくなります。
+                    </p>
                 </CardContent>
             </Card>
 
@@ -243,18 +271,24 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                                 <TableHead className="w-[100px]">状態</TableHead>
                                 <TableHead className="hidden w-[100px] md:table-cell">難易度</TableHead>
                                 <TableHead className="hidden w-[80px] text-right md:table-cell">ログ</TableHead>
+                                <TableHead className="hidden w-[90px] text-right md:table-cell">記録</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {questions.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                                         条件に一致する問題が見つかりませんでした。
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                questions.map((q) => (
-                                    <TableRow key={q.id}>
+                                questions.map((q) => {
+                                    const isDue = Boolean(q.nextReviewDate && q.nextReviewDate <= today);
+                                    return (
+                                    <TableRow
+                                        key={q.id}
+                                        className={isDue ? "bg-amber-50/70 dark:bg-amber-900/10" : ""}
+                                    >
                                         <TableCell className="font-mono font-bold text-blue-600 dark:text-blue-400">
                                             {q.id}
                                             {q.mustSolve && (
@@ -262,6 +296,11 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                                                     ★必解
                                                 </span>
                                             )}
+                                            <div className="mt-2 md:hidden">
+                                                <Button asChild size="sm" variant="outline" className="h-7 px-2 text-xs">
+                                                    <Link href={`/quicklog?q=${q.id}`}>記録</Link>
+                                                </Button>
+                                            </div>
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">{q.year}</TableCell>
                                         <TableCell>
@@ -307,6 +346,14 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                                             ) : (
                                                 <span className="text-muted-foreground text-sm">-</span>
                                             )}
+                                            {isDue && (
+                                                <Badge
+                                                    variant="outline"
+                                                    className="ml-2 border-amber-500 text-amber-700 bg-amber-50 dark:border-amber-400 dark:text-amber-200 dark:bg-amber-950/40"
+                                                >
+                                                    期限切れ
+                                                </Badge>
+                                            )}
                                         </TableCell>
                                         <TableCell className="hidden md:table-cell">
                                             <div className="flex text-yellow-500 text-sm">
@@ -319,8 +366,14 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                                         <TableCell className="hidden text-right text-muted-foreground md:table-cell">
                                             {q._count.logs}
                                         </TableCell>
+                                        <TableCell className="hidden text-right md:table-cell">
+                                            <Button asChild size="sm" variant="outline">
+                                                <Link href={`/quicklog?q=${q.id}`}>記録</Link>
+                                            </Button>
+                                        </TableCell>
                                     </TableRow>
-                                ))
+                                );
+                                })
                             )}
                         </TableBody>
                     </Table>

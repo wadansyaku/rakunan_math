@@ -8,19 +8,15 @@ import {
     ClipboardList,
     BookOpen,
     RefreshCw,
-    Key,
-    Upload,
-    Search,
+    Settings,
 } from "lucide-react";
 
 const navItems = [
     { href: "/", label: "ホーム", icon: Home },
     { href: "/quicklog", label: "QuickLog", icon: ClipboardList },
-    { href: "/questions", label: "問題バンク", icon: BookOpen },
     { href: "/review", label: "復習リスト", icon: RefreshCw },
-    { href: "/answer-key", label: "正答管理", icon: Key },
-    { href: "/import", label: "インポート", icon: Upload, admin: true },
-    { href: "/health-check", label: "整合性チェック", icon: Search, admin: true },
+    { href: "/questions", label: "問題バンク", icon: BookOpen },
+    { href: "/settings", label: "設定", icon: Settings },
 ];
 
 export function Navigation() {
@@ -45,9 +41,6 @@ export function Navigation() {
                                     href={item.href}
                                     className={cn(
                                         "flex shrink-0 items-center space-x-1 rounded-md px-2 py-2 text-xs font-medium transition-colors sm:px-3 sm:text-sm",
-                                        item.admin
-                                            ? "opacity-60 hover:opacity-100 sm:flex hidden"
-                                            : "",
                                         isActive
                                             ? "bg-primary text-primary-foreground"
                                             : "text-muted-foreground hover:text-foreground hover:bg-muted"

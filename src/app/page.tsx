@@ -13,7 +13,6 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import {
-  BookOpen,
   ClipboardList,
   Clock,
   Target,
@@ -31,7 +30,6 @@ export default async function Home() {
 
   // 並列でデータ取得
   const [
-    totalQuestions,
     totalLogs,
     logsToday,
     dueQuestions,
@@ -39,7 +37,6 @@ export default async function Home() {
     allQuestionStats,
     activityCounts,
   ] = await Promise.all([
-    prisma.question.count(),
     prisma.answerLog.count(),
     prisma.answerLog.count({
       where: {
@@ -94,7 +91,7 @@ export default async function Home() {
   return (
     <div className="space-y-8">
       {/* ヒーローセクション */}
-      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">今日の実施数</CardTitle>
@@ -117,18 +114,6 @@ export default async function Home() {
             <div className="text-2xl font-bold text-orange-600">{dueQuestions}</div>
             <p className="text-xs text-muted-foreground">
               期限切れの問題
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="bg-muted/30">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">総問題数</CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-xl font-semibold text-muted-foreground">{totalQuestions}</div>
-            <p className="text-xs text-muted-foreground/80">
-              登録済み（全259問中）
             </p>
           </CardContent>
         </Card>
