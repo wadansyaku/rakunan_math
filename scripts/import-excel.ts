@@ -6,6 +6,8 @@
 
 import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client.js";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
@@ -14,13 +16,11 @@ import { parse } from "csv-parse/sync";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const prisma = new PrismaClient({
-    datasources: {
-        db: {
-            url: process.env.DIRECT_URL || process.env.DATABASE_URL,
-        },
-    },
+const pool = new Pool({
+    connectionString: process.env.DIRECT_URL || process.env.DATABASE_URL,
 });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 interface QuestionRow {
     年度: string;
