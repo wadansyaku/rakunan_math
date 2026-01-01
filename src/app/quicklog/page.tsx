@@ -59,34 +59,37 @@ function Timer({ onApply }: { onApply: (minutes: string) => void }) {
     };
 
     return (
-        <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/30">
-            <div className="font-mono text-xl font-bold w-16 text-center">
+        <div className="flex items-center gap-2 p-3 border rounded-md bg-muted/30">
+            <div className="font-mono text-2xl font-bold w-20 text-center">
                 {formatTime(seconds)}
             </div>
             <Button
                 type="button"
-                size="icon"
+                size="default"
                 variant="ghost"
+                className="min-h-[44px] min-w-[44px]"
                 onClick={() => setIsRunning(!isRunning)}
             >
-                {isRunning ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                {isRunning ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
             </Button>
             <Button
                 type="button"
-                size="icon"
+                size="default"
                 variant="ghost"
+                className="min-h-[44px] min-w-[44px]"
                 onClick={handleStop}
                 disabled={seconds === 0}
             >
-                <Square className="h-4 w-4 fill-current" />
+                <Square className="h-5 w-5 fill-current" />
             </Button>
             <Button
                 type="button"
-                size="icon"
+                size="default"
                 variant="ghost"
+                className="min-h-[44px] min-w-[44px]"
                 onClick={() => { setIsRunning(false); setSeconds(0); }}
             >
-                <RotateCcw className="h-4 w-4" />
+                <RotateCcw className="h-5 w-5" />
             </Button>
         </div>
     );

@@ -169,137 +169,113 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                 </div>
             </div>
 
+            {/* フィルターセクション - モバイルでは折りたたみ */}
             <Card>
-                <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                        <Filter className="w-5 h-5" />
-                        検索・フィルタ
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form className="space-y-4">
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-8 items-end">
-                            <div className="space-y-2 lg:col-span-2">
-                                <Label htmlFor="q">キーワード</Label>
-                                <Input
-                                    id="q"
-                                    name="q"
-                                    placeholder="ID, タイトル, タグ..."
-                                    defaultValue={params.q || ""}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="year">年度</Label>
-                                <Input
-                                    id="year"
-                                    name="year"
-                                    type="number"
-                                    placeholder="例: 2024"
-                                    defaultValue={params.year || ""}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="tagGroup">分野</Label>
-                                <Select name="tagGroup" defaultValue={params.tagGroup || "all"}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="全分野" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">全分野</SelectItem>
-                                        {TAG_GROUPS.map((group) => (
-                                            <SelectItem key={group} value={group}>
-                                                {group}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="status">状態</Label>
-                                <Select name="status" defaultValue={status}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="全て" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">全て</SelectItem>
-                                        <SelectItem value="none">未実施</SelectItem>
-                                        <SelectItem value="correct">正解 (Correct)</SelectItem>
-                                        <SelectItem value="partial">部分正解 (Partial)</SelectItem>
-                                        <SelectItem value="wrong">不正解 (Wrong)</SelectItem>
-                                        <SelectItem value="skipped">スキップ (Skipped)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="mustSolve">必解</Label>
-                                <Select name="mustSolve" defaultValue={params.mustSolve || "all"}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="全て" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">全て</SelectItem>
-                                        <SelectItem value="true">必解のみ</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="due">復習期限</Label>
-                                <Select name="due" defaultValue={dueOnly ? "true" : "all"}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="全て" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">全て</SelectItem>
-                                        <SelectItem value="true">期限切れのみ</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="sort">並び替え</Label>
-                                <Select name="sort" defaultValue={sort}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="年度順" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="year">年度順</SelectItem>
-                                        <SelectItem value="recent">最近学習した順</SelectItem>
-                                        <SelectItem value="due">復習期限順</SelectItem>
-                                        <SelectItem value="logs">ログが多い順</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="limit">表示件数</Label>
-                                <Select name="limit" defaultValue={String(limit)}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="100件" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {limitOptions.map((value) => (
-                                            <SelectItem key={value} value={String(value)}>
-                                                {value}件
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="md:col-span-2 lg:col-span-1">
-                                <div className="flex gap-2">
-                                    <Button type="submit" className="w-full">
-                                        <Search className="w-4 h-4 mr-2" />
-                                        検索
-                                    </Button>
-                                    <Button asChild type="button" variant="outline" className="shrink-0">
-                                        <Link href="/questions">クリア</Link>
-                                    </Button>
+                <details className="group" open>
+                    <summary className="flex items-center justify-between cursor-pointer list-none px-6 py-4">
+                        <div className="flex items-center gap-2 font-semibold">
+                            <Filter className="w-5 h-5" />
+                            検索・フィルタ
+                        </div>
+                        <span className="text-muted-foreground text-sm group-open:hidden">タップして開く</span>
+                        <span className="text-muted-foreground text-sm hidden group-open:inline">タップして閉じる</span>
+                    </summary>
+                    <CardContent className="pt-0">
+                        <form className="space-y-4">
+                            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-8 items-end">
+                                <div className="col-span-2 space-y-2">
+                                    <Label htmlFor="q">キーワード</Label>
+                                    <Input
+                                        id="q"
+                                        name="q"
+                                        placeholder="ID, タイトル, タグ..."
+                                        defaultValue={params.q || ""}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="year">年度</Label>
+                                    <Input
+                                        id="year"
+                                        name="year"
+                                        type="number"
+                                        placeholder="例: 2024"
+                                        defaultValue={params.year || ""}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="tagGroup">分野</Label>
+                                    <Select name="tagGroup" defaultValue={params.tagGroup || "all"}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="全分野" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">全分野</SelectItem>
+                                            {TAG_GROUPS.map((group) => (
+                                                <SelectItem key={group} value={group}>
+                                                    {group}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="status">状態</Label>
+                                    <Select name="status" defaultValue={status}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="全て" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">全て</SelectItem>
+                                            <SelectItem value="none">未実施</SelectItem>
+                                            <SelectItem value="correct">正解</SelectItem>
+                                            <SelectItem value="partial">部分正解</SelectItem>
+                                            <SelectItem value="wrong">不正解</SelectItem>
+                                            <SelectItem value="skipped">スキップ</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="due">復習期限</Label>
+                                    <Select name="due" defaultValue={dueOnly ? "true" : "all"}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="全て" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">全て</SelectItem>
+                                            <SelectItem value="true">期限切れ</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="limit">件数</Label>
+                                    <Select name="limit" defaultValue={String(limit)}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="100件" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {limitOptions.map((value) => (
+                                                <SelectItem key={value} value={String(value)}>
+                                                    {value}件
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="col-span-2 md:col-span-1">
+                                    <div className="flex gap-2">
+                                        <Button type="submit" className="flex-1 min-h-[44px]">
+                                            <Search className="w-4 h-4 mr-2" />
+                                            検索
+                                        </Button>
+                                        <Button asChild type="button" variant="outline" className="min-h-[44px]">
+                                            <Link href="/questions">クリア</Link>
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                    <p className="text-xs text-muted-foreground">
-                        ヒント: 「期限切れのみ」や「最近学習した順」を使うと、次に取り組む問題が見つけやすくなります。
-                    </p>
-                </CardContent>
+                        </form>
+                    </CardContent>
+                </details>
             </Card>
 
             <Card>
@@ -341,7 +317,7 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                                                     </span>
                                                 )}
                                                 <div className="mt-2 md:hidden">
-                                                    <Button asChild size="sm" variant="outline" className="h-7 px-2 text-xs">
+                                                    <Button asChild size="sm" variant="outline" className="min-h-[44px] min-w-[44px] px-3">
                                                         <Link href={`/quicklog?q=${q.id}`}>記録</Link>
                                                     </Button>
                                                 </div>

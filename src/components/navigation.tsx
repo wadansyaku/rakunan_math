@@ -31,7 +31,7 @@ export function Navigation() {
                             洛南 算数 過去問
                         </span>
                     </Link>
-                    <div className="flex items-center gap-1 overflow-x-auto py-1">
+                    <div className="hidden md:flex items-center gap-1 overflow-x-auto py-1">
                         {navItems.map((item) => {
                             const Icon = item.icon;
                             const isActive = pathname === item.href;
@@ -40,14 +40,14 @@ export function Navigation() {
                                     key={item.href}
                                     href={item.href}
                                     className={cn(
-                                        "flex shrink-0 items-center space-x-1 rounded-md px-2 py-2 text-xs font-medium transition-colors sm:px-3 sm:text-sm",
+                                        "flex shrink-0 items-center space-x-1 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                                         isActive
                                             ? "bg-primary text-primary-foreground"
                                             : "text-muted-foreground hover:text-foreground hover:bg-muted"
                                     )}
                                 >
                                     <Icon className="h-4 w-4" />
-                                    <span className="hidden md:inline">{item.label}</span>
+                                    <span>{item.label}</span>
                                 </Link>
                             );
                         })}
