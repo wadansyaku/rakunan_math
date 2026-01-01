@@ -57,23 +57,63 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
     const parsedLimit = Number.parseInt(params.limit || "100", 10);
     const limit = limitOptions.includes(parsedLimit) ? parsedLimit : 100;
 
-    const whereCondition: Prisma.QuestionWhereInput = {
-        ...(params.year && { year: parseInt(params.year) }),
-        ...(params.tagGroup && params.tagGroup !== "all" && { tagGroup: params.tagGroup }),
-        ...(params.mustSolve === "true" && { mustSolve: true }),
-        ...(params.q && {
-            OR: [
-                { id: { contains: params.q } },
-                { sectionTitle: { contains: params.q } },
-                { tag1: { contains: params.q } },
-                { tag2: { contains: params.q } },
-                { tag3: { contains: params.q } },
-            ],
-        }),
+    const tagGroupKeywordsMap: Record<string, string[]> = {
+        "計算": ["計算"],
+        "整数・数論": ["整数", "数の性質", "数論"],
+        "場合の数": ["場合の数"],
+        "割合・比": ["割合", "比"],
+        "速さ": ["速さ"],
+        "文章題": ["文章題"],
+        "平面図形": ["平面図形", "図形"],
+        "立体図形": ["立体図形", "立体", "体積", "表面積"],
+        "グラフ・資料": ["グラフ", "資料", "図表", "データ"],
+        "その他": ["その他"],
     };
 
+    const andConditions: Prisma.QuestionWhereInput[] = [];
+
+    if (params.year) {
+        andConditions.push({ year: parseInt(params.year) });
+    }
+
+    if (params.mustSolve === "true") {
+        andConditions.push({ mustSolve: true });
+    }
+
+    const keyword = params.q?.trim();
+    if (keyword) {
+        andConditions.push({
+            OR: [
+                { id: { contains: keyword } },
+                { sectionTitle: { contains: keyword } },
+                { tag1: { contains: keyword } },
+                { tag2: { contains: keyword } },
+                { tag3: { contains: keyword } },
+            ],
+        });
+    }
+
+    const selectedTagGroup =
+        params.tagGroup && params.tagGroup !== "all" ? params.tagGroup : null;
+    if (selectedTagGroup) {
+        const keywords =
+            tagGroupKeywordsMap[selectedTagGroup] ?? [selectedTagGroup];
+        const orConditions: Prisma.QuestionWhereInput[] = [];
+        for (const term of keywords) {
+            const contains = { contains: term, mode: "insensitive" } as const;
+            orConditions.push(
+                { tagGroup: contains },
+                { tag1: contains },
+                { tag2: contains },
+                { tag3: contains },
+                { problemType: contains }
+            );
+        }
+        andConditions.push({ OR: orConditions });
+    }
+
     if (status === "none") {
-        whereCondition.lastResult = null;
+        andConditions.push({ lastResult: null });
     } else if (status !== "all") {
         const statusMap: Record<string, string> = {
             correct: "Correct",
@@ -83,13 +123,16 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
         };
         const mapped = statusMap[status];
         if (mapped) {
-            whereCondition.lastResult = mapped;
+            andConditions.push({ lastResult: mapped });
         }
     }
 
     if (dueOnly) {
-        whereCondition.nextReviewDate = { lte: today };
+        andConditions.push({ nextReviewDate: { lte: today } });
     }
+
+    const whereCondition: Prisma.QuestionWhereInput =
+        andConditions.length > 0 ? { AND: andConditions } : {};
 
     const orderBy: Prisma.QuestionOrderByWithRelationInput[] =
         sort === "due"
@@ -284,6 +327,7 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                             ) : (
                                 questions.map((q) => {
                                     const isDue = Boolean(q.nextReviewDate && q.nextReviewDate <= today);
+                                    const groupLabel = q.tagGroup || q.problemType || q.tag2 || "未分類";
                                     return (
                                     <TableRow
                                         key={q.id}
@@ -306,7 +350,7 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                                         <TableCell>
                                             <div className="font-medium truncate">{q.sectionTitle || "-"}</div>
                                             <div className="text-sm text-muted-foreground">
-                                                {q.tagGroup || "未分類"}
+                                                {groupLabel}
                                             </div>
                                             <div className="mt-1 flex flex-wrap gap-1 md:hidden">
                                                 {q.tag1 && (
