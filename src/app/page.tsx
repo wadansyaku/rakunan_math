@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 import { TAG_GROUPS } from "@/lib/constants";
 import { getJstDateString, getRecentDateStrings } from "@/lib/date";
 import {
@@ -25,6 +25,7 @@ import { ActivityChart } from "@/components/dashboard/activity-chart";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
+  const prisma = getPrismaClient();
   const today = getJstDateString();
   const recentDates = getRecentDateStrings(14, today);
 

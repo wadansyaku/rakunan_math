@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 
 interface QuestionData {
     id: string;
@@ -55,6 +55,7 @@ interface ImportBody {
 
 export async function POST(request: NextRequest) {
     try {
+        const prisma = getPrismaClient();
         const body: ImportBody = await request.json();
         const errors: string[] = [];
         const counts = {

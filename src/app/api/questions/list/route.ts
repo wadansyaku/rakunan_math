@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 
 export async function GET() {
     try {
+        const prisma = getPrismaClient();
         // 全問題を取得（年度・大問・小問でグループ化用）
         const questions = await prisma.question.findMany({
             select: {

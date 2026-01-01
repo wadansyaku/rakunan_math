@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 import { addDays, getJstDateString } from "@/lib/date";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export async function POST(request: NextRequest) {
     try {
+        const prisma = getPrismaClient();
         const body = await request.json();
         const {
             studyDate,
@@ -111,6 +112,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "50");
 
     try {
+        const prisma = getPrismaClient();
         const logs = await prisma.answerLog.findMany({
             where: questionId ? { questionId } : undefined,
             orderBy: [{ studyDate: "desc" }, { createdAt: "desc" }],

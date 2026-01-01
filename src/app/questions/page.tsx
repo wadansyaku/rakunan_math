@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 import { TAG_GROUPS } from "@/lib/constants";
 import {
     Card,
@@ -41,6 +41,7 @@ interface PageProps {
 
 export default async function QuestionsPage({ searchParams }: PageProps) {
     const params = await searchParams;
+    const prisma = getPrismaClient();
 
     const whereCondition: Prisma.QuestionWhereInput = {
         ...(params.year && { year: parseInt(params.year) }),

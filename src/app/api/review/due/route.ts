@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 import { getJstDateString } from "@/lib/date";
 
 export async function GET() {
     try {
+        const prisma = getPrismaClient();
         const today = getJstDateString();
 
         // 期限切れの問題を取得

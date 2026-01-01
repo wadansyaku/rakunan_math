@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 import {
     Card,
     CardContent,
@@ -42,6 +42,7 @@ interface Question {
 }
 
 async function getReviewQuestions() {
+    const prisma = getPrismaClient();
     const today = getJstDateString();
 
     // 期限切れの問題を取得

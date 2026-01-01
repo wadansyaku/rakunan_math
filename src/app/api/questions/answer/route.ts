@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 
 // 問題の正答を更新
 export async function PATCH(request: NextRequest) {
     try {
+        const prisma = getPrismaClient();
         const body = await request.json();
         const { questionId, correctText, unit, answerNote } = body;
 

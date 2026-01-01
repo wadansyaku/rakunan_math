@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 import {
     Card,
     CardContent,
@@ -33,6 +33,7 @@ interface CheckResult {
 }
 
 async function runHealthChecks(): Promise<CheckResult[]> {
+    const prisma = getPrismaClient();
     const results: CheckResult[] = [];
 
     // 1. 問題IDが空のQuestion

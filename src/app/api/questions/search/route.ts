@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { getPrismaClient } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
+        const prisma = getPrismaClient();
         const questions = await prisma.question.findMany({
             where: {
                 OR: [
