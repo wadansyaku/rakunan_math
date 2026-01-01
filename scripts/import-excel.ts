@@ -14,7 +14,9 @@ import { parse } from "csv-parse/sync";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const prisma = new PrismaClient({});
+const prisma = new PrismaClient({
+    datasourceUrl: process.env.DIRECT_URL || process.env.DATABASE_URL,
+});
 
 interface QuestionRow {
     年度: string;
