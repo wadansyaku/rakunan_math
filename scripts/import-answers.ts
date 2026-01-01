@@ -1,6 +1,8 @@
 import "dotenv/config";
-import { prisma } from '../src/lib/prisma';
-import { answerData } from '../data/answer-data';
+import { getPrismaClient } from "../src/lib/prisma";
+import { answerData } from "../data/answer-data";
+
+const prisma = getPrismaClient();
 
 async function importAnswers() {
     console.log('=== 解答データインポート ===');
