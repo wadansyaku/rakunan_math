@@ -1,5 +1,7 @@
 import "dotenv/config";
-import { prisma } from '../src/lib/prisma';
+import { getPrismaClient } from "../src/lib/prisma";
+
+const prisma = getPrismaClient();
 
 async function resetLogs() {
     console.log('=== 学習ログ削除スクリプト ===');
