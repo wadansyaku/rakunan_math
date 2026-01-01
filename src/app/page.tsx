@@ -219,13 +219,13 @@ export default async function Home() {
                   recentLogs.map((log) => (
                     <div
                       key={log.id}
-                      className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0"
+                      className="flex flex-col gap-2 border-b pb-2 last:border-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
                     >
-                      <div>
+                      <div className="min-w-0">
                         <div className="font-medium text-sm">
                           {log.questionId}
                         </div>
-                        <div className="text-xs text-muted-foreground truncate max-w-[180px]">
+                        <div className="text-xs text-muted-foreground truncate max-w-full sm:max-w-[180px]">
                           {log.question?.sectionTitle || "タイトルなし"}
                         </div>
                       </div>

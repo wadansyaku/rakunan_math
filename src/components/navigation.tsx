@@ -29,13 +29,13 @@ export function Navigation() {
     return (
         <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto px-4">
-                <div className="flex h-14 items-center justify-between">
+                <div className="flex h-14 items-center justify-between gap-3">
                     <Link href="/" className="flex items-center space-x-2">
-                        <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        <span className="font-bold text-base sm:text-xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                             洛南 算数 過去問
                         </span>
                     </Link>
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center gap-1 overflow-x-auto py-1">
                         {navItems.map((item) => {
                             const Icon = item.icon;
                             const isActive = pathname === item.href;
@@ -44,7 +44,7 @@ export function Navigation() {
                                     key={item.href}
                                     href={item.href}
                                     className={cn(
-                                        "flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                                        "flex shrink-0 items-center space-x-1 rounded-md px-2 py-2 text-xs font-medium transition-colors sm:px-3 sm:text-sm",
                                         isActive
                                             ? "bg-primary text-primary-foreground"
                                             : "text-muted-foreground hover:text-foreground hover:bg-muted"

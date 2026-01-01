@@ -236,9 +236,9 @@ export default function AnswerKeyPage() {
                                 className={`p-4 border rounded-lg transition-colors ${editingId === q.id ? "bg-muted/50 border-primary" : "hover:bg-muted/30"
                                     }`}
                             >
-                                <div className="flex items-start gap-4">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
                                     {/* 問題ID */}
-                                    <div className="w-24 flex-shrink-0">
+                                    <div className="w-full flex-shrink-0 sm:w-24">
                                         <span className="font-mono font-bold text-sm">{q.sub}</span>
                                         {q.difficulty && (
                                             <div className="text-yellow-500 text-xs mt-1">
@@ -250,8 +250,8 @@ export default function AnswerKeyPage() {
                                     {/* 正答エリア */}
                                     {editingId === q.id ? (
                                         <div className="flex-1 space-y-3">
-                                            <div className="grid grid-cols-3 gap-3">
-                                                <div className="col-span-2">
+                                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                                                <div className="sm:col-span-2">
                                                     <Label className="text-xs">正答</Label>
                                                     <Input
                                                         value={editValues.correctText}

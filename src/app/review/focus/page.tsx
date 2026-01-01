@@ -236,7 +236,7 @@ export default function FocusModePage() {
 
                     {/* 結果入力 */}
                     {!result ? (
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <Button
                                 size="lg"
                                 className="bg-green-600 hover:bg-green-700 h-20 text-lg"
@@ -257,14 +257,14 @@ export default function FocusModePage() {
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between p-4 border rounded-lg bg-background">
-                                <div className="font-bold flex items-center gap-2">
+                            <div className="flex flex-col gap-3 rounded-lg border bg-background p-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex items-center gap-2 font-bold">
                                     結果:
                                     <Badge variant={result === "Correct" ? "default" : "destructive"}>
                                         {result}
                                     </Badge>
                                 </div>
-                                <Button onClick={handleNext}>
+                                <Button onClick={handleNext} className="w-full sm:w-auto">
                                     次の問題へ <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
                             </div>

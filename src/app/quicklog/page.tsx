@@ -179,9 +179,9 @@ function QuestionSelector({
             <Label className="text-sm font-medium">問題を選択</Label>
 
             {/* 年度と大問の選択 */}
-            <div className="flex gap-2 items-center">
+            <div className="flex flex-wrap items-center gap-2">
                 <Select value={selectedYear} onValueChange={(v) => { setSelectedYear(v); setSelectedSection(""); }}>
-                    <SelectTrigger className="w-28">
+                    <SelectTrigger className="w-24 sm:w-28">
                         <SelectValue placeholder="年度" />
                     </SelectTrigger>
                     <SelectContent>
@@ -194,7 +194,7 @@ function QuestionSelector({
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
 
                 <Select value={selectedSection} onValueChange={setSelectedSection} disabled={!selectedYear}>
-                    <SelectTrigger className="w-24">
+                    <SelectTrigger className="w-20 sm:w-24">
                         <SelectValue placeholder="大問" />
                     </SelectTrigger>
                     <SelectContent>
@@ -205,7 +205,7 @@ function QuestionSelector({
                 </Select>
 
                 {selectedSection && (
-                    <span className="text-sm text-muted-foreground truncate max-w-[200px]">
+                    <span className="text-sm text-muted-foreground truncate max-w-full sm:max-w-[200px]">
                         {sectionTitle}
                     </span>
                 )}
@@ -213,7 +213,7 @@ function QuestionSelector({
 
             {/* 小問ボタングリッド */}
             {subQuestions.length > 0 && (
-                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 p-3 bg-muted/30 rounded-lg">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 p-3 bg-muted/30 rounded-lg">
                     {subQuestions.map(q => (
                         <Button
                             key={q.id}
