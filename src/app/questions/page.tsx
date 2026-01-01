@@ -303,8 +303,8 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
             </Card>
 
             <Card>
-                <CardContent className="p-0">
-                    <Table>
+                <CardContent className="p-0 sticky-table-container">
+                    <Table className="sticky-table-header">
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-[120px]">問題ID</TableHead>
@@ -329,94 +329,94 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
                                     const isDue = Boolean(q.nextReviewDate && q.nextReviewDate <= today);
                                     const groupLabel = q.tagGroup || q.problemType || q.tag2 || "未分類";
                                     return (
-                                    <TableRow
-                                        key={q.id}
-                                        className={isDue ? "bg-amber-50/70 dark:bg-amber-900/10" : ""}
-                                    >
-                                        <TableCell className="font-mono font-bold text-blue-600 dark:text-blue-400">
-                                            {q.id}
-                                            {q.mustSolve && (
-                                                <span className="block text-[10px] text-red-500 font-bold">
-                                                    ★必解
-                                                </span>
-                                            )}
-                                            <div className="mt-2 md:hidden">
-                                                <Button asChild size="sm" variant="outline" className="h-7 px-2 text-xs">
+                                        <TableRow
+                                            key={q.id}
+                                            className={isDue ? "bg-amber-50/70 dark:bg-amber-900/10" : ""}
+                                        >
+                                            <TableCell className="font-mono font-bold text-blue-600 dark:text-blue-400">
+                                                {q.id}
+                                                {q.mustSolve && (
+                                                    <span className="block text-[10px] text-red-500 font-bold">
+                                                        ★必解
+                                                    </span>
+                                                )}
+                                                <div className="mt-2 md:hidden">
+                                                    <Button asChild size="sm" variant="outline" className="h-7 px-2 text-xs">
+                                                        <Link href={`/quicklog?q=${q.id}`}>記録</Link>
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="hidden md:table-cell">{q.year}</TableCell>
+                                            <TableCell>
+                                                <div className="font-medium truncate">{q.sectionTitle || "-"}</div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    {groupLabel}
+                                                </div>
+                                                <div className="mt-1 flex flex-wrap gap-1 md:hidden">
+                                                    {q.tag1 && (
+                                                        <Badge variant="outline" className="text-[10px]">
+                                                            {q.tag1}
+                                                        </Badge>
+                                                    )}
+                                                    {q.tag2 && (
+                                                        <Badge variant="outline" className="text-[10px]">
+                                                            {q.tag2}
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="hidden md:table-cell">
+                                                <div className="flex gap-1 flex-wrap">
+                                                    {q.tag1 && <Badge variant="outline" className="text-xs">{q.tag1}</Badge>}
+                                                    {q.tag2 && <Badge variant="outline" className="text-xs">{q.tag2}</Badge>}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                {q.lastResult ? (
+                                                    <Badge
+                                                        variant={
+                                                            q.lastResult === "Correct"
+                                                                ? "default" // shadcnでは 'success' がないため default(黒) またはカスタムクラス
+                                                                : q.lastResult === "Wrong"
+                                                                    ? "destructive"
+                                                                    : "secondary"
+                                                        }
+                                                        className={
+                                                            q.lastResult === "Correct" ? "bg-green-600 hover:bg-green-700" : ""
+                                                        }
+                                                    >
+                                                        {q.lastResult}
+                                                    </Badge>
+                                                ) : (
+                                                    <span className="text-muted-foreground text-sm">-</span>
+                                                )}
+                                                {isDue && (
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="ml-2 border-amber-500 text-amber-700 bg-amber-50 dark:border-amber-400 dark:text-amber-200 dark:bg-amber-950/40"
+                                                    >
+                                                        期限切れ
+                                                    </Badge>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="hidden md:table-cell">
+                                                <div className="flex text-yellow-500 text-sm">
+                                                    {"★".repeat(q.difficulty || 0)}
+                                                    <span className="text-gray-300">
+                                                        {"★".repeat(5 - (q.difficulty || 0))}
+                                                    </span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="hidden text-right text-muted-foreground md:table-cell">
+                                                {q._count.logs}
+                                            </TableCell>
+                                            <TableCell className="hidden text-right md:table-cell">
+                                                <Button asChild size="sm" variant="outline">
                                                     <Link href={`/quicklog?q=${q.id}`}>記録</Link>
                                                 </Button>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">{q.year}</TableCell>
-                                        <TableCell>
-                                            <div className="font-medium truncate">{q.sectionTitle || "-"}</div>
-                                            <div className="text-sm text-muted-foreground">
-                                                {groupLabel}
-                                            </div>
-                                            <div className="mt-1 flex flex-wrap gap-1 md:hidden">
-                                                {q.tag1 && (
-                                                    <Badge variant="outline" className="text-[10px]">
-                                                        {q.tag1}
-                                                    </Badge>
-                                                )}
-                                                {q.tag2 && (
-                                                    <Badge variant="outline" className="text-[10px]">
-                                                        {q.tag2}
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            <div className="flex gap-1 flex-wrap">
-                                                {q.tag1 && <Badge variant="outline" className="text-xs">{q.tag1}</Badge>}
-                                                {q.tag2 && <Badge variant="outline" className="text-xs">{q.tag2}</Badge>}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            {q.lastResult ? (
-                                                <Badge
-                                                    variant={
-                                                        q.lastResult === "Correct"
-                                                            ? "default" // shadcnでは 'success' がないため default(黒) またはカスタムクラス
-                                                            : q.lastResult === "Wrong"
-                                                                ? "destructive"
-                                                                : "secondary"
-                                                    }
-                                                    className={
-                                                        q.lastResult === "Correct" ? "bg-green-600 hover:bg-green-700" : ""
-                                                    }
-                                                >
-                                                    {q.lastResult}
-                                                </Badge>
-                                            ) : (
-                                                <span className="text-muted-foreground text-sm">-</span>
-                                            )}
-                                            {isDue && (
-                                                <Badge
-                                                    variant="outline"
-                                                    className="ml-2 border-amber-500 text-amber-700 bg-amber-50 dark:border-amber-400 dark:text-amber-200 dark:bg-amber-950/40"
-                                                >
-                                                    期限切れ
-                                                </Badge>
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="hidden md:table-cell">
-                                            <div className="flex text-yellow-500 text-sm">
-                                                {"★".repeat(q.difficulty || 0)}
-                                                <span className="text-gray-300">
-                                                    {"★".repeat(5 - (q.difficulty || 0))}
-                                                </span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="hidden text-right text-muted-foreground md:table-cell">
-                                            {q._count.logs}
-                                        </TableCell>
-                                        <TableCell className="hidden text-right md:table-cell">
-                                            <Button asChild size="sm" variant="outline">
-                                                <Link href={`/quicklog?q=${q.id}`}>記録</Link>
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                );
+                                            </TableCell>
+                                        </TableRow>
+                                    );
                                 })
                             )}
                         </TableBody>

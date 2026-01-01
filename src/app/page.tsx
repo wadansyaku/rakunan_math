@@ -157,7 +157,13 @@ export default async function Home() {
                 </div>
               ))}
               {tagStats.length === 0 && (
-                <div className="text-center text-muted-foreground py-4">データがありません</div>
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-3">📚</div>
+                  <p className="text-muted-foreground mb-4">まだ分野別の学習データがありません</p>
+                  <Button asChild size="sm" variant="outline">
+                    <Link href="/quicklog">最初の1問を解いてみよう！</Link>
+                  </Button>
+                </div>
               )}
             </div>
           </CardContent>
@@ -177,7 +183,7 @@ export default async function Home() {
                   答え合わせをする (QuickLog)
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="w-full">
+              <Button asChild variant="secondary" className="w-full border border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950">
                 <Link href="/review">
                   <Clock className="mr-2 h-4 w-4" />
                   復習リストを確認

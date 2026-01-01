@@ -167,9 +167,13 @@ function QuestionSelector({
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center p-4">
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                読み込み中...
+            <div className="space-y-3">
+                <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                <div className="flex items-center gap-2">
+                    <div className="h-10 w-28 bg-muted animate-pulse rounded" />
+                    <div className="h-4 w-4 bg-muted animate-pulse rounded" />
+                    <div className="h-10 w-24 bg-muted animate-pulse rounded" />
+                </div>
             </div>
         );
     }

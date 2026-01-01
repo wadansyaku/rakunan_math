@@ -80,7 +80,7 @@ async function getReviewQuestions() {
     const randomQuestions = await prisma.question.findMany({
         take: 5,
         skip: skip,
-        include: { _count: { select: { logs: true } } },
+        select: { id: true, tagGroup: true, problemType: true, tag2: true },
     });
 
     return { dueQuestions, wrongQuestions, randomQuestions };
@@ -350,7 +350,7 @@ export default async function ReviewPage() {
                                 {randomQuestions.map((q) => (
                                     <TableRow key={q.id}>
                                         <TableCell className="font-mono">{q.id}</TableCell>
-                                        <TableCell>{q.tagGroup || "-"}</TableCell>
+                                        <TableCell>{q.tagGroup || q.problemType || q.tag2 || "未分類"}</TableCell>
                                         <TableCell>
                                             <Link href={`/quicklog?q=${q.id}`}>
                                                 <Button size="sm" variant="outline">
