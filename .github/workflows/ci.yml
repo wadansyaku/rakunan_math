@@ -29,6 +29,9 @@ jobs:
 
       - name: Generate Prisma Client
         run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/app
+          DIRECT_URL: postgresql://user:pass@localhost:5432/app
 
       - name: Run linter
         run: npm run lint
@@ -58,6 +61,9 @@ jobs:
 
       - name: Generate Prisma Client
         run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/app
+          DIRECT_URL: postgresql://user:pass@localhost:5432/app
 
       # テストは後で追加予定
       - name: Run tests (placeholder)
