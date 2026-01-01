@@ -1,5 +1,5 @@
 // 自動生成: Excel Lists シートから
-// Generated: 2025-12-31T18:30:57.517Z
+// Generated: 2026-01-01T12:59:49.385Z
 
 export const RESULT_OPTIONS = [
   "Correct",
