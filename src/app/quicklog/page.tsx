@@ -500,7 +500,10 @@ AI機能の設定が完了していません。
                         {/* 解答時間 */}
                         <div className="grid gap-2">
                             <div className="flex items-center justify-between">
-                                <Label htmlFor="minutes">解答時間 (分)</Label>
+                                <Label htmlFor="minutes">
+                                    解答時間 (分)
+                                    <span className="text-xs text-muted-foreground font-normal ml-2">※不明なら空欄でOK</span>
+                                </Label>
                                 <Timer onApply={(m) => setMinutes(m)} />
                             </div>
                             <Input
@@ -508,7 +511,7 @@ AI機能の設定が完了していません。
                                 type="number"
                                 step="0.1"
                                 min="0"
-                                placeholder="例: 3.5"
+                                placeholder="例: 3.5 (省略可)"
                                 value={minutes}
                                 onChange={(e) => setMinutes(e.target.value)}
                             />
