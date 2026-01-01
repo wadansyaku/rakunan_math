@@ -15,7 +15,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const prisma = new PrismaClient({
-    datasourceUrl: process.env.DIRECT_URL || process.env.DATABASE_URL,
+    datasources: {
+        db: {
+            url: process.env.DIRECT_URL || process.env.DATABASE_URL,
+        },
+    },
 });
 
 interface QuestionRow {

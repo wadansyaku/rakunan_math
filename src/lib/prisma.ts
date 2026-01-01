@@ -4,10 +4,12 @@ const globalForPrisma = globalThis as unknown as {
     prisma: PrismaClient | undefined;
 };
 
-const datasourceUrl = process.env.DATABASE_URL || process.env.DIRECT_URL;
-
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({
-    datasourceUrl,
+    datasources: {
+        db: {
+            url: process.env.DIRECT_URL || process.env.DATABASE_URL,
+        },
+    },
 });
 
 if (process.env.NODE_ENV !== 'production') {
