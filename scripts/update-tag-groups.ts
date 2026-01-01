@@ -7,7 +7,7 @@
 import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma/client.js";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({});
 
 // キーワードとTagGroupのマッピング（優先度順）
 const TAG_MAPPING: Record<string, string[]> = {
