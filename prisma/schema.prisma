@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// 問題バンク
+model Question {
+  id            String   @id // 問題ID（例: 2022-Q4(2)）
+  year          Int
+  examType      String?
+  section       Int      // 大問
+  sub           String   // 小問（(1) / ア / ...）
+  sectionTitle  String?
+  tag1          String?
+  tag2          String?
+  tag3          String?
+  tagGroup      String?
+  difficulty    Int?     // 1-5
+  estMinutes    Float?
+  points        Float?
+  mustSolve     Boolean?
+  phase         String?
+  problemType   String?
+  sourceUrl     String?
+  fieldKey      String?
+  fieldName     String?
+  fieldType     String?
+
+  correctText   String?  // 正答（テキスト）
+  unit          String?
+  answerNote    String?
+
+  // 集計用フィールド
+  lastResult    String?
+  lastStudyDate String?
+  reviewInterval Int?
+  nextReviewDate String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  logs          AnswerLog[]
+
+  @@index([nextReviewDate])
+}
+
+// 解答ログ
+model AnswerLog {
+  id           String   @id @default(cuid())
+  studyDate    String
+  questionId   String
+  result       String   // Correct/Partial/Wrong/Skipped
+  missType     String?
+  minutes      Float?
+  cause        String?
+  action       String?
+  memo         String?
+  studentAns   String?
+
+  correctText  String?
+  autoJudge    String? // MATCH / NO
+
+  createdAt    DateTime @default(now())
+
+  question     Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId, studyDate])
+  @@index([studyDate])
+}
+
+// タグ辞書
+model TagDictionary {
+  id        String @id @default(cuid())
+  tagGroup  String
+  tagCode   String?
+  tag       String
+  desc      String?
+  examples  String?
+  note      String?
+}
+
+// セクション定義
+model SectionDefinition {
+  id            String @id // Key
+  year          Int
+  section       Int
+  order         Int?
+  sectionTitle  String?
+  sectionType   String?
+  defaultPhase  String?
+  typicalTagGroup String?
+  typicalTags   String?
+  notes         String?
+}
