@@ -8,14 +8,21 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function resolveConnectionString(): string | null {
+  const normalize = (value: string | undefined): string | null => {
+    if (!value) return null;
+    const trimmed = value.trim().replace(/^["']|["']$/g, "");
+    const match = trimmed.match(/postgres(?:ql)?:\/\/[^\s"']+/);
+    return match ? match[0] : null;
+  };
+
   const pooledUrl =
-    process.env.POSTGRES_PRISMA_URL ||
-    process.env.POSTGRES_URL ||
-    process.env.DATABASE_URL;
+    normalize(process.env.POSTGRES_PRISMA_URL) ||
+    normalize(process.env.POSTGRES_URL) ||
+    normalize(process.env.DATABASE_URL);
   const directUrl =
-    process.env.POSTGRES_URL_NON_POOLING ||
-    process.env.DATABASE_URL_UNPOOLED ||
-    process.env.DIRECT_URL;
+    normalize(process.env.POSTGRES_URL_NON_POOLING) ||
+    normalize(process.env.DATABASE_URL_UNPOOLED) ||
+    normalize(process.env.DIRECT_URL);
   return pooledUrl || directUrl || null;
 }
 
@@ -28,7 +35,7 @@ export function getPrismaClient(): PrismaClient {
 
   if (!connectionString || !connectionString.startsWith("postgres")) {
     throw new Error(
-      "DATABASE_URL is missing or invalid. Set POSTGRES_PRISMA_URL/POSTGRES_URL or DATABASE_URL to a valid postgres URL."
+      "DATABASE_URL is missing or invalid. Set POSTGRES_PRISMA_URL/POSTGRES_URL or DATABASE_URL to a valid postgres URL (no quotes, no KEY= prefix)."
     );
   }
 
