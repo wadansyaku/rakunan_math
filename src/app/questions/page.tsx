@@ -303,18 +303,18 @@ export default async function QuestionsPage({ searchParams }: PageProps) {
             </Card>
 
             <Card>
-                <CardContent className="p-0 sticky-table-container">
-                    <Table className="sticky-table-header">
-                        <TableHeader>
+                <CardContent className="p-0 max-h-[70vh] overflow-y-auto">
+                    <Table>
+                        <TableHeader className="sticky top-0 z-10 bg-card shadow-sm">
                             <TableRow>
-                                <TableHead className="w-[120px]">問題ID</TableHead>
-                                <TableHead className="hidden w-[80px] md:table-cell">年度</TableHead>
-                                <TableHead>タイトル / 分野</TableHead>
-                                <TableHead className="hidden md:table-cell">タグ</TableHead>
-                                <TableHead className="w-[100px]">状態</TableHead>
-                                <TableHead className="hidden w-[100px] md:table-cell">難易度</TableHead>
-                                <TableHead className="hidden w-[80px] text-right md:table-cell">ログ</TableHead>
-                                <TableHead className="hidden w-[90px] text-right md:table-cell">記録</TableHead>
+                                <TableHead className="w-[120px] bg-card">問題ID</TableHead>
+                                <TableHead className="hidden w-[80px] md:table-cell bg-card">年度</TableHead>
+                                <TableHead className="bg-card">タイトル / 分野</TableHead>
+                                <TableHead className="hidden md:table-cell bg-card">タグ</TableHead>
+                                <TableHead className="w-[100px] bg-card">状態</TableHead>
+                                <TableHead className="hidden w-[100px] md:table-cell bg-card">難易度</TableHead>
+                                <TableHead className="hidden w-[80px] text-right md:table-cell bg-card">ログ</TableHead>
+                                <TableHead className="hidden w-[90px] text-right md:table-cell bg-card">記録</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
