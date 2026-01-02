@@ -63,18 +63,16 @@ export async function POST(request: NextRequest) {
             lastStudyDate: normalizedStudyDate,
         };
 
-        // 復習間隔の計算（SM-2アルゴリズムの簡易版）
-        let newInterval = question.reviewInterval || 1;
-        if (result === "Correct") {
-            newInterval = Math.min(newInterval * 2, 30);
-        } else if (result === "Wrong") {
-            newInterval = 1;
-        } else if (result === "Partial") {
-            newInterval = Math.max(1, Math.floor(newInterval * 1.2));
-        }
+        // 復習間隔の計算（SM-2アルゴリズム - 一元化されたモジュールを使用）
+        const { calculateNextReview } = await import("@/lib/learning/spaced-repetition");
+        const reviewResult = calculateNextReview({
+            currentInterval: question.reviewInterval,
+            result,
+            studyDate: normalizedStudyDate,
+        });
 
-        updateData.reviewInterval = newInterval;
-        updateData.nextReviewDate = addDays(normalizedStudyDate, newInterval);
+        updateData.reviewInterval = reviewResult.newInterval;
+        updateData.nextReviewDate = reviewResult.nextReviewDate;
 
         const [log] = await prisma.$transaction([
             prisma.answerLog.create({

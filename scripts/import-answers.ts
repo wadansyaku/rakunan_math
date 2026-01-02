@@ -1,11 +1,7 @@
-import "dotenv/config";
-import { getPrismaClient } from "../src/lib/prisma";
+import { runScript } from "./lib/runner";
 import { answerData } from "../data/answer-data";
 
-const prisma = getPrismaClient();
-
-async function importAnswers() {
-    console.log('=== 解答データインポート ===');
+runScript("解答データインポート", async ({ prisma }) => {
     console.log(`入力データ: ${Object.keys(answerData).length}件`);
 
     let updated = 0;
@@ -25,31 +21,31 @@ async function importAnswers() {
             if (result) {
                 updated++;
             }
-        } catch (error) {
-            // 問題が存在しない場合
+        } catch {
             notFound++;
             notFoundIds.push(questionId);
         }
     }
 
-    console.log(`✓ 更新成功: ${updated}件`);
     if (notFound > 0) {
-        console.log(`✗ 問題が見つからなかった: ${notFound}件`);
-        console.log(`  ID一覧: ${notFoundIds.slice(0, 10).join(', ')}${notFoundIds.length > 10 ? '...' : ''}`);
+        console.log(`⚠️ 問題が見つからなかった: ${notFound}件`);
+        console.log(`  ID一覧: ${notFoundIds.slice(0, 10).join(", ")}${notFoundIds.length > 10 ? "..." : ""}`);
     }
 
-    // 統計情報を表示
+    // 統計情報
     const stats = await prisma.question.aggregate({
         _count: { id: true },
     });
     const withAnswer = await prisma.question.count({
         where: { correctText: { not: null } },
     });
-    console.log(`\n=== 結果 ===`);
-    console.log(`総問題数: ${stats._count.id}`);
-    console.log(`正答登録済み: ${withAnswer}件 (${((withAnswer / stats._count.id) * 100).toFixed(1)}%)`);
-}
 
-importAnswers()
-    .catch(console.error)
-    .finally(() => prisma.$disconnect());
+    return {
+        success: notFound === 0,
+        message: `更新成功: ${updated}件`,
+        data: {
+            総問題数: stats._count.id,
+            正答登録済み: `${withAnswer}件 (${((withAnswer / stats._count.id) * 100).toFixed(1)}%)`,
+        },
+    };
+});

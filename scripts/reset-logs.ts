@@ -1,14 +1,9 @@
-import "dotenv/config";
-import { getPrismaClient } from "../src/lib/prisma";
+import { runScript } from "./lib/runner";
 
-const prisma = getPrismaClient();
-
-async function resetLogs() {
-    console.log('=== 学習ログ削除スクリプト ===');
-
+runScript("学習ログリセット", async ({ prisma }) => {
     // 1. AnswerLogを全削除
     const deletedLogs = await prisma.answerLog.deleteMany({});
-    console.log(`✓ AnswerLog ${deletedLogs.count}件を削除しました`);
+    console.log(`📝 AnswerLog ${deletedLogs.count}件を削除`);
 
     // 2. Questionの集計フィールドをリセット
     const updatedQuestions = await prisma.question.updateMany({
@@ -19,11 +14,14 @@ async function resetLogs() {
             nextReviewDate: null,
         },
     });
-    console.log(`✓ Question ${updatedQuestions.count}件のステータスをリセットしました`);
+    console.log(`📝 Question ${updatedQuestions.count}件のステータスをリセット`);
 
-    console.log('=== 完了 ===');
-}
-
-resetLogs()
-    .catch(console.error)
-    .finally(() => prisma.$disconnect());
+    return {
+        success: true,
+        message: "全ての学習ログをリセットしました",
+        data: {
+            削除ログ数: deletedLogs.count,
+            リセット問題数: updatedQuestions.count,
+        },
+    };
+});

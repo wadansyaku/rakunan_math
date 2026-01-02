@@ -1,46 +1,34 @@
-
-import "dotenv/config";
+import { runScript } from "./lib/runner";
 import { execSync } from "child_process";
-import { getPrismaClient } from "../src/lib/prisma";
 
-async function main() {
-    console.log("🚀 Starting Acceptance Test...\n");
-    const prisma = getPrismaClient();
+runScript("Acceptance Test", async ({ prisma }) => {
+    // 1. Lint Check
+    console.log("🔍 Running Lint Check...");
+    execSync("npm run lint", { stdio: "inherit" });
+    console.log("✅ Lint Check Passed!");
 
-    try {
-        // 1. Lint Check
-        console.log("🔍 Running Lint Check...");
-        execSync("npm run lint", { stdio: "inherit" });
-        console.log("✅ Lint Check Passed!\n");
+    // 2. Build Check
+    console.log("\n🏗️  Running Build Check...");
+    execSync("npm run build", { stdio: "inherit" });
+    console.log("✅ Build Check Passed!");
 
-        // 2. Build Check
-        console.log("🏗️  Running Build Check...");
-        // building creates .next folder, which might take time
-        execSync("npm run build", { stdio: "inherit" });
-        console.log("✅ Build Check Passed!\n");
+    // 3. Data Integrity Check
+    console.log("\n💾 Checking Database Integrity...");
 
-        // 3. Data Integrity Check
-        console.log("💾 Checking Database Integrity...");
+    const questionCount = await prisma.question.count();
+    console.log(`   - Questions: ${questionCount}`);
+    if (questionCount === 0) throw new Error("No questions found in database!");
 
-        const questionCount = await prisma.question.count();
-        console.log(`   - Questions: ${questionCount}`);
-        if (questionCount === 0) throw new Error("No questions found in database!");
+    const tagCount = await prisma.tagDictionary.count();
+    console.log(`   - Tags: ${tagCount}`);
+    if (tagCount === 0) throw new Error("No tags found in database!");
 
-        const tagCount = await prisma.tagDictionary.count();
-        console.log(`   - Tags: ${tagCount}`);
-        if (tagCount === 0) throw new Error("No tags found in database!");
-
-        console.log("✅ Database Integrity Check Passed!\n");
-
-        console.log("🎉 ALL CHECKS PASSED! The system is ready.");
-
-    } catch (error) {
-        console.error("\n❌ Acceptance Test Failed!");
-        console.error(error);
-        process.exit(1);
-    } finally {
-        await prisma.$disconnect();
-    }
-}
-
-main();
+    return {
+        success: true,
+        message: "ALL CHECKS PASSED! The system is ready.",
+        data: {
+            questions: questionCount,
+            tags: tagCount,
+        },
+    };
+});
