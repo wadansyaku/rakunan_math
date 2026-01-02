@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,10 +18,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Save, RotateCcw, CheckCircle, XCircle, MinusCircle, Sparkles, Loader2 } from "lucide-react";
-import ReactMarkdown from "react-markdown";
+import { Save, RotateCcw, CheckCircle, XCircle, MinusCircle } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 import { MISS_TYPES, Result } from "@/lib/constants";
@@ -46,33 +44,14 @@ export function QuickLogForm() {
     const [missType, setMissType] = useState<string>("");
     const [minutes, setMinutes] = useState("");
     const [memo, setMemo] = useState("");
-    const [studentAns, setStudentAns] = useState("");
-    const [questionInfo, setQuestionInfo] = useState<QuestionInfo | null>(null);
-    const [autoJudge, setAutoJudge] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // AI分析用
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
-    const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
 
     const questionIdRef = useRef<HTMLInputElement>(null);
 
     // 問題選択時のハンドラ
     const handleQuestionSelect = useCallback((q: QuestionInfo) => {
         setQuestionId(q.id);
-        setQuestionInfo(q);
     }, []);
-
-    // 解答の自動判定
-    useEffect(() => {
-        if (studentAns && questionInfo?.correctText) {
-            const normalized = (s: string) => s.trim().replace(/\s+/g, "");
-            const isMatch = normalized(studentAns) === normalized(questionInfo.correctText);
-            setAutoJudge(isMatch ? "MATCH" : "NO");
-        } else {
-            setAutoJudge(null);
-        }
-    }, [studentAns, questionInfo]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -95,8 +74,6 @@ export function QuickLogForm() {
                     missType: missType || null,
                     minutes: minutes ? parseFloat(minutes) : null,
                     memo: memo || null,
-                    studentAns: studentAns || null,
-                    autoJudge,
                 }),
             });
 
@@ -109,69 +86,16 @@ export function QuickLogForm() {
                 description: `${questionId} - ${result}`,
             });
 
-            // フォームをリセット（日付と年度選択は維持）
+            // フォームをリセット（日付は維持）
             setQuestionId("");
             setResult("");
             setMissType("");
             setMinutes("");
             setMemo("");
-            setStudentAns("");
-            setQuestionInfo(null);
-            setAutoJudge(null);
-            setAiAnalysis(null);
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "保存に失敗しました");
         } finally {
             setIsSubmitting(false);
-        }
-    };
-
-    const handleAIAnalyze = async () => {
-        if (!questionId || !result) {
-            toast.error("分析には問題IDと結果の入力が必要です");
-            return;
-        }
-
-        setIsAnalyzing(true);
-        setAiAnalysis(null);
-
-        try {
-            const res = await fetch("/api/ai/analyze", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    questionId,
-                    result,
-                    missType,
-                    memo,
-                    correctText: questionInfo?.correctText,
-                    studentAns,
-                }),
-            });
-
-            if (res.status === 503) {
-                toast.error("AI機能は現在利用できません");
-                return;
-            }
-
-            if (!res.ok) throw new Error("分析に失敗しました");
-
-            const data = await res.json();
-            setAiAnalysis(data.analysis);
-            toast.success("分析が完了しました");
-        } catch (error) {
-            console.error(error);
-            toast.error("エラーが発生しました");
-            setAiAnalysis(`
-**（デモ応答）**
-AI機能の設定が完了していません。
-
-1. **原因分析**: ケアレスミスの可能性
-2. **改善アクション**: 計算の途中式を丁寧に書く
-3. **励まし**: 次はきっと解けます！
-            `);
-        } finally {
-            setIsAnalyzing(false);
         }
     };
 
@@ -181,10 +105,6 @@ AI機能の設定が完了していません。
         setMissType("");
         setMinutes("");
         setMemo("");
-        setStudentAns("");
-        setQuestionInfo(null);
-        setAutoJudge(null);
-        setAiAnalysis(null);
         questionIdRef.current?.focus();
     };
 
@@ -192,13 +112,13 @@ AI機能の設定が完了していません。
         <div className="max-w-2xl mx-auto space-y-6">
             <div className="text-center space-y-2">
                 <h1 className="text-3xl font-bold">QuickLog</h1>
-                <p className="text-muted-foreground">解答を素早く記録</p>
+                <p className="text-muted-foreground">復習記録を素早く入力</p>
             </div>
 
             <form onSubmit={handleSubmit}>
                 <Card>
                     <CardHeader>
-                        <CardTitle>解答ログ入力</CardTitle>
+                        <CardTitle>復習ログ入力</CardTitle>
                         <CardDescription>
                             年度→大問→小問を選択、または問題IDを直接入力
                         </CardDescription>
@@ -226,11 +146,6 @@ AI機能の設定が完了していません。
                             <div className="flex items-center gap-3 p-3 bg-primary/10 rounded-lg border border-primary/20">
                                 <span className="text-sm text-muted-foreground">選択中:</span>
                                 <span className="font-mono font-bold text-lg">{questionId}</span>
-                                {questionInfo?.correctText && (
-                                    <Badge variant="outline" className="ml-auto text-green-600 border-green-300">
-                                        正答: {questionInfo.correctText}{questionInfo.unit && ` (${questionInfo.unit})`}
-                                    </Badge>
-                                )}
                             </div>
                         )}
 
@@ -242,7 +157,7 @@ AI機能の設定が完了していません。
                             <div className="mt-2">
                                 <Input
                                     ref={questionIdRef}
-                                    placeholder="例: 2022-Q4(2)"
+                                    placeholder="例: H29-Q4(2)"
                                     value={questionId}
                                     onChange={(e) => setQuestionId(e.target.value)}
                                     autoComplete="off"
@@ -308,24 +223,6 @@ AI機能の設定が完了していません。
                             />
                         </div>
 
-                        {/* 生徒解答 */}
-                        <div className="grid gap-2">
-                            <Label htmlFor="studentAns">生徒の解答 (任意)</Label>
-                            <div className="flex gap-2 items-center">
-                                <Input
-                                    id="studentAns"
-                                    placeholder="生徒が書いた答え"
-                                    value={studentAns}
-                                    onChange={(e) => setStudentAns(e.target.value)}
-                                />
-                                {autoJudge && (
-                                    <Badge variant={autoJudge === "MATCH" ? "default" : "destructive"}>
-                                        {autoJudge}
-                                    </Badge>
-                                )}
-                            </div>
-                        </div>
-
                         {/* メモ */}
                         <div className="grid gap-2">
                             <Label htmlFor="memo">メモ (任意)</Label>
@@ -335,38 +232,6 @@ AI機能の設定が完了していません。
                                 value={memo}
                                 onChange={(e) => setMemo(e.target.value)}
                             />
-                        </div>
-
-                        {/* AI分析 */}
-                        <div className="pt-2">
-                            {!aiAnalysis && (
-                                <Button
-                                    type="button"
-                                    variant="secondary"
-                                    size="sm"
-                                    className="w-full"
-                                    onClick={handleAIAnalyze}
-                                    disabled={isAnalyzing || !questionId}
-                                >
-                                    {isAnalyzing ? (
-                                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> 分析中...</>
-                                    ) : (
-                                        <><Sparkles className="h-4 w-4 mr-2 text-purple-500" /> AIで原因と対策を分析</>
-                                    )}
-                                </Button>
-                            )}
-                            {aiAnalysis && (
-                                <Card className="bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-900 mt-2">
-                                    <CardHeader className="py-3">
-                                        <CardTitle className="text-sm font-medium flex items-center gap-2 text-purple-800 dark:text-purple-300">
-                                            <Sparkles className="h-4 w-4" /> AI分析
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="text-sm prose dark:prose-invert max-w-none py-3">
-                                        <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
-                                    </CardContent>
-                                </Card>
-                            )}
                         </div>
 
                         {/* ボタン */}

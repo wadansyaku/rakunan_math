@@ -22,16 +22,9 @@ interface QuestionData {
     fieldKey?: string | null;
     fieldName?: string | null;
     fieldType?: string | null;
-    correctText?: string | null;
-    unit?: string | null;
-    answerNote?: string | null;
 }
 
-interface AnswerKeyData {
-    questionId: string;
-    correctText?: string | null;
-    unit?: string | null;
-}
+// AnswerKeyは削除（復習記録専用アプリ化）
 
 interface AnswerLogData {
     studyDate: string;
@@ -42,14 +35,10 @@ interface AnswerLogData {
     cause?: string | null;
     action?: string | null;
     memo?: string | null;
-    studentAns?: string | null;
-    correctText?: string | null;
-    autoJudge?: string | null;
 }
 
 interface ImportBody {
     questions: QuestionData[];
-    answerKey: AnswerKeyData[];
     answerLog: AnswerLogData[];
 }
 
@@ -60,7 +49,6 @@ export async function POST(request: NextRequest) {
         const errors: string[] = [];
         const counts = {
             questions: 0,
-            answerKey: 0,
             answerLog: 0,
         };
 
@@ -95,9 +83,6 @@ export async function POST(request: NextRequest) {
                             fieldKey: q.fieldKey ? String(q.fieldKey) : null,
                             fieldName: q.fieldName ? String(q.fieldName) : null,
                             fieldType: q.fieldType ? String(q.fieldType) : null,
-                            correctText: q.correctText ? String(q.correctText) : null,
-                            unit: q.unit ? String(q.unit) : null,
-                            answerNote: q.answerNote ? String(q.answerNote) : null,
                         },
                         create: {
                             id: String(q.id),
@@ -120,9 +105,6 @@ export async function POST(request: NextRequest) {
                             fieldKey: q.fieldKey ? String(q.fieldKey) : null,
                             fieldName: q.fieldName ? String(q.fieldName) : null,
                             fieldType: q.fieldType ? String(q.fieldType) : null,
-                            correctText: q.correctText ? String(q.correctText) : null,
-                            unit: q.unit ? String(q.unit) : null,
-                            answerNote: q.answerNote ? String(q.answerNote) : null,
                         },
                     });
                     counts.questions++;
@@ -132,33 +114,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // AnswerKey のインポート（既存のQuestionのcorrectTextを更新）
-        if (body.answerKey && body.answerKey.length > 0) {
-            for (const a of body.answerKey) {
-                if (!a.questionId) continue;
-
-                try {
-                    const question = await prisma.question.findUnique({
-                        where: { id: String(a.questionId) },
-                    });
-
-                    if (question) {
-                        await prisma.question.update({
-                            where: { id: String(a.questionId) },
-                            data: {
-                                correctText: a.correctText ? String(a.correctText) : null,
-                                unit: a.unit ? String(a.unit) : null,
-                            },
-                        });
-                        counts.answerKey++;
-                    } else {
-                        errors.push(`問題 ${a.questionId} が見つかりません`);
-                    }
-                } catch (err) {
-                    errors.push(`正答 ${a.questionId} の更新に失敗: ${err}`);
-                }
-            }
-        }
+        // AnswerKey インポートは削除（復習記録専用アプリ化）
 
         // AnswerLog のインポート
         if (body.answerLog && body.answerLog.length > 0) {
@@ -186,9 +142,6 @@ export async function POST(request: NextRequest) {
                             cause: l.cause ? String(l.cause) : null,
                             action: l.action ? String(l.action) : null,
                             memo: l.memo ? String(l.memo) : null,
-                            studentAns: l.studentAns ? String(l.studentAns) : null,
-                            correctText: l.correctText ? String(l.correctText) : null,
-                            autoJudge: l.autoJudge ? String(l.autoJudge) : null,
                         },
                     });
                     counts.answerLog++;

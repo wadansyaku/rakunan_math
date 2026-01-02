@@ -58,20 +58,9 @@ interface QuestionRow {
     "メモ(解法/典型/ミス)": string;
     出典URL: string;
     "TagGroup(集計)": string;
-    "正答(テキスト)": string;
-    単位: string;
-    "正答メモ(AnswerKey備考)": string;
 }
 
-interface AnswerKeyRow {
-    年度: string;
-    大問: string;
-    小問: string;
-    "問題ID(固定)": string;
-    "正答(テキスト)": string;
-    単位: string;
-    備考: string;
-}
+// AnswerKeyは削除（復習記録専用アプリ化）
 
 interface TagRow {
     TagGroup: string;
@@ -156,9 +145,6 @@ async function main() {
                     phase: q["フェーズ(前半/後半)"] || null,
                     problemType: q["問題タイプ(計算/図形/文章…)"] || null,
                     sourceUrl: q.出典URL || null,
-                    correctText: q["正答(テキスト)"] || null,
-                    unit: q.単位 || null,
-                    answerNote: q["正答メモ(AnswerKey備考)"] || null,
                 },
             });
             importedQuestions++;
@@ -168,34 +154,8 @@ async function main() {
     }
     console.log(`   Imported ${importedQuestions} questions\n`);
 
-    // 3. AnswerKey をインポート（Questionsの正答を更新）
-    console.log("🔑 Importing Answer Keys...");
-    const answerKeyContent = fs.readFileSync(path.join(dataDir, "answerkey.csv"), "utf-8");
-    const answerKeys: AnswerKeyRow[] = parse(answerKeyContent, { columns: true, skip_empty_lines: true });
-
-    let updatedAnswers = 0;
-    for (const a of answerKeys) {
-        const questionId = a["問題ID(固定)"];
-        if (!questionId) continue;
-
-        try {
-            const existing = await prisma.question.findUnique({ where: { id: questionId } });
-            if (existing) {
-                await prisma.question.update({
-                    where: { id: questionId },
-                    data: {
-                        correctText: a["正答(テキスト)"] || existing.correctText,
-                        unit: a.単位 || existing.unit,
-                        answerNote: a.備考 || existing.answerNote,
-                    },
-                });
-                updatedAnswers++;
-            }
-        } catch (err) {
-            console.error(`   Error updating ${questionId}:`, err);
-        }
-    }
-    console.log(`   Updated ${updatedAnswers} answer keys\n`);
+    // 3. (AnswerKeyインポートは削除 - 復習記録専用アプリ化)
+    console.log("🔑 Skipping Answer Keys import (review-only app)...\n");
 
     // 4. Lists.json を読み込んで定数ファイルを生成
     console.log("📋 Generating constants...");
@@ -223,12 +183,10 @@ export type TagGroup = typeof TAG_GROUPS[number];
     const stats = {
         questions: await prisma.question.count(),
         tags: await prisma.tagDictionary.count(),
-        questionsWithAnswers: await prisma.question.count({ where: { correctText: { not: null } } }),
     };
 
     console.log("✅ Import completed!");
     console.log(`   Total questions: ${stats.questions}`);
-    console.log(`   Questions with answers: ${stats.questionsWithAnswers}`);
     console.log(`   Tag dictionary entries: ${stats.tags}`);
 }
 

@@ -44,7 +44,6 @@ export async function GET(request: NextRequest) {
             "minutes",
             "missType",
             "memo",
-            "studentAns",
         ].join(",");
 
         // CSVデータ行
@@ -54,8 +53,6 @@ export async function GET(request: NextRequest) {
             const escapedTitle = title.includes(",") ? `"${title}"` : title;
             const memo = log.memo || "";
             const escapedMemo = memo.includes(",") ? `"${memo}"` : memo;
-            const studentAns = log.studentAns || "";
-            const escapedStudentAns = studentAns.includes(",") ? `"${studentAns}"` : studentAns;
 
             return [
                 date,
@@ -65,7 +62,6 @@ export async function GET(request: NextRequest) {
                 log.minutes || "",
                 log.missType || "",
                 escapedMemo,
-                escapedStudentAns,
             ].join(",");
         });
 

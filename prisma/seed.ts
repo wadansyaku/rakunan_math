@@ -29,78 +29,71 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
     console.log("Seeding database...");
 
-    // サンプル問題を作成
+    // サンプル問題を作成（復習記録専用アプリ向け）
     const question1 = await prisma.question.upsert({
-        where: { id: "2024-Q1(1)" },
+        where: { id: "H29-Q1(1)" },
         update: {},
         create: {
-            id: "2024-Q1(1)",
-            year: 2024,
+            id: "H29-Q1(1)",
+            year: 2017,
             examType: "本試験",
             section: 1,
             sub: "(1)",
             sectionTitle: "計算問題",
             tag1: "計算",
-            tag2: "四則演算",
+            tag2: "分数小数",
+            tagGroup: "計算",
             difficulty: 2,
             estMinutes: 2,
             points: 5,
             mustSolve: true,
             phase: "基礎",
-            correctText: "42",
-            unit: null,
-            answerNote: "計算順序に注意",
             reviewInterval: 3,
             nextReviewDate: "2025-01-04",
         },
     });
 
     const question2 = await prisma.question.upsert({
-        where: { id: "2024-Q1(2)" },
+        where: { id: "H29-Q1(2)" },
         update: {},
         create: {
-            id: "2024-Q1(2)",
-            year: 2024,
+            id: "H29-Q1(2)",
+            year: 2017,
             examType: "本試験",
             section: 1,
             sub: "(2)",
             sectionTitle: "計算問題",
             tag1: "計算",
-            tag2: "分数",
+            tag2: "工夫計算",
+            tagGroup: "計算",
             difficulty: 3,
             estMinutes: 3,
             points: 5,
             mustSolve: true,
             phase: "基礎",
-            correctText: "5/6",
-            unit: null,
-            answerNote: "約分を忘れずに",
             reviewInterval: 1,
-            nextReviewDate: "2024-12-30", // 期限切れ
+            nextReviewDate: "2024-12-30",
         },
     });
 
     const question3 = await prisma.question.upsert({
-        where: { id: "2024-Q2(1)" },
+        where: { id: "H29-Q6(1)" },
         update: {},
         create: {
-            id: "2024-Q2(1)",
-            year: 2024,
+            id: "H29-Q6(1)",
+            year: 2017,
             examType: "本試験",
-            section: 2,
+            section: 6,
             sub: "(1)",
-            sectionTitle: "図形問題",
+            sectionTitle: "平面図形",
             tag1: "図形",
-            tag2: "面積",
-            tagGroup: "平面図形",
+            tag2: "相似・比",
+            tagGroup: "図形",
             difficulty: 4,
             estMinutes: 5,
             points: 8,
             mustSolve: false,
             phase: "応用",
-            correctText: "24",
-            unit: "cm²",
-            answerNote: "補助線を引く",
         },
     });
 
@@ -112,8 +105,6 @@ async function main() {
             result: "Correct",
             minutes: 1.5,
             memo: "問題なし",
-            correctText: question1.correctText,
-            autoJudge: "MATCH",
         },
     });
 
@@ -127,9 +118,6 @@ async function main() {
             cause: "約分を忘れた",
             action: "約分の確認を習慣化",
             memo: "もう一度復習",
-            studentAns: "10/12",
-            correctText: question2.correctText,
-            autoJudge: "NO",
         },
     });
 
@@ -142,16 +130,25 @@ async function main() {
             minutes: 6,
             cause: "補助線の引き方が不適切",
             memo: "別解も確認する",
-            correctText: question3.correctText,
         },
     });
 
-    // タグ辞書を作成
+    // タグ辞書を作成（新taxonomy対応）
     const tagData = [
-        { tagGroup: "計算", tag: "四則演算", desc: "足し算、引き算、掛け算、割り算" },
-        { tagGroup: "計算", tag: "分数", desc: "分数の計算" },
-        { tagGroup: "図形", tag: "面積", desc: "図形の面積を求める問題" },
-        { tagGroup: "図形", tag: "体積", desc: "立体の体積を求める問題" },
+        { tagGroup: "計算", tag: "単位換算", desc: "単位の変換" },
+        { tagGroup: "計算", tag: "工夫計算", desc: "計算の工夫" },
+        { tagGroup: "計算", tag: "分数小数", desc: "分数・小数の計算" },
+        { tagGroup: "図形", tag: "相似・比", desc: "相似比・面積比" },
+        { tagGroup: "図形", tag: "角度", desc: "角度を求める問題" },
+        { tagGroup: "図形", tag: "立体の切断", desc: "立体の切断" },
+        { tagGroup: "文章題", tag: "場合の数", desc: "場合の数" },
+        { tagGroup: "文章題", tag: "食塩水", desc: "食塩水・濃度" },
+        { tagGroup: "割合", tag: "速さと比", desc: "速さと比" },
+        { tagGroup: "割合", tag: "割合・比（基本）", desc: "割合・比の基本" },
+        { tagGroup: "整数", tag: "規則性", desc: "規則性" },
+        { tagGroup: "整数", tag: "数列", desc: "数列" },
+        { tagGroup: "整数", tag: "約数・倍数", desc: "約数・倍数" },
+        { tagGroup: "整数", tag: "剰余", desc: "余りに関する問題" },
     ];
 
     for (const tag of tagData) {

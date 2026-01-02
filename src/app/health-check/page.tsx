@@ -89,30 +89,19 @@ async function runHealthChecks(): Promise<CheckResult[]> {
         })),
     });
 
-    // 4. 正答が未登録の問題（年度別）
-    const questionsWithoutAnswer = await prisma.question.findMany({
-        where: {
-            correctText: null,
-        },
-        select: { id: true, year: true },
+    // 4. 年度別問題数（統計情報）
+    const questionsByYear = await prisma.question.groupBy({
+        by: ["year"],
+        _count: { id: true },
         orderBy: { year: "desc" },
     });
-    const yearCounts: Record<number, number> = {};
-    questionsWithoutAnswer.forEach((q) => {
-        yearCounts[q.year] = (yearCounts[q.year] || 0) + 1;
-    });
     results.push({
-        name: "正答未登録の問題",
-        status:
-            questionsWithoutAnswer.length === 0
-                ? "ok"
-                : questionsWithoutAnswer.length < 10
-                    ? "warning"
-                    : "error",
-        count: questionsWithoutAnswer.length,
-        details: Object.entries(yearCounts).map(([year, count]) => ({
-            id: year,
-            message: `${count}件の問題で正答未登録`,
+        name: "年度別問題数",
+        status: "ok",
+        count: questionsByYear.length,
+        details: questionsByYear.slice(0, 10).map((q) => ({
+            id: String(q.year),
+            message: `${q._count.id}問`,
         })),
     });
 

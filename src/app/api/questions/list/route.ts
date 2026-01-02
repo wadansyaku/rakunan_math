@@ -13,8 +13,7 @@ export async function GET() {
                 sub: true,
                 sectionTitle: true,
                 difficulty: true,
-                correctText: true,
-                unit: true,
+                tagGroup: true,
             },
             orderBy: [
                 { year: "desc" },

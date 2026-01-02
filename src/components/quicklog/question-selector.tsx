@@ -18,9 +18,8 @@ export interface QuestionInfo {
     section: number;
     sub: string;
     sectionTitle?: string;
-    correctText?: string;
-    unit?: string;
     difficulty?: number;
+    tagGroup?: string;
 }
 
 interface QuestionSelectorProps {

@@ -33,9 +33,7 @@ model Question {
   fieldName     String?
   fieldType     String?
 
-  correctText   String?  // 正答（テキスト）
-  unit          String?
-  answerNote    String?
+  // 正答フィールド削除（復習記録専用アプリ化）
 
   // 集計用フィールド
   lastResult    String?
@@ -62,10 +60,7 @@ model AnswerLog {
   cause        String?
   action       String?
   memo         String?
-  studentAns   String?
-
-  correctText  String?
-  autoJudge    String? // MATCH / NO
+  // 採点関連フィールド削除（復習記録専用アプリ化）
 
   createdAt    DateTime @default(now())
 

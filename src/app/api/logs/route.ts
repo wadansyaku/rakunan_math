@@ -16,8 +16,6 @@ export async function POST(request: NextRequest) {
             missType,
             minutes,
             memo,
-            studentAns,
-            autoJudge,
         } = body;
 
         const normalizedStudyDate = studyDate || date || getJstDateString();
@@ -83,9 +81,6 @@ export async function POST(request: NextRequest) {
                     missType,
                     minutes,
                     memo,
-                    studentAns,
-                    correctText: question.correctText,
-                    autoJudge,
                 },
             }),
             prisma.question.update({
